@@ -240,6 +240,51 @@ const engine = new Engine(GODOT_CONFIG);
     <div style="font-size:16px; opacity:0.8;">Poo Catcher Panic plays best in landscape</div>
   </div>
 </div>
+<script>
+(function () {
+  function ready(fn) {
+    if (document.readyState !== "loading") fn();
+    else document.addEventListener("DOMContentLoaded", fn);
+  }
+  ready(function () {
+    var canvas = document.getElementById("canvas");
+    if (!canvas) return;
+    var lastX = 0, lastY = 0;
+
+    function fireMouse(type, x, y) {
+      canvas.dispatchEvent(new MouseEvent(type, {
+        bubbles: true, cancelable: true, composed: true,
+        clientX: x, clientY: y, button: 0,
+        buttons: type === "mouseup" ? 0 : 1, view: window,
+      }));
+    }
+
+    canvas.addEventListener("touchstart", function (e) {
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      var t = e.touches[0];
+      lastX = t.clientX; lastY = t.clientY;
+      fireMouse("mousedown", lastX, lastY);
+    }, { passive: false });
+
+    canvas.addEventListener("touchmove", function (e) {
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      var t = e.touches[0];
+      lastX = t.clientX; lastY = t.clientY;
+      fireMouse("mousemove", lastX, lastY);
+    }, { passive: false });
+
+    function endTouch(e) {
+      e.preventDefault();
+      fireMouse("mouseup", lastX, lastY);
+      fireMouse("click", lastX, lastY);
+    }
+    canvas.addEventListener("touchend", endTouch, { passive: false });
+    canvas.addEventListener("touchcancel", endTouch, { passive: false });
+  });
+})();
+</script>
 </body>
 </html>
 
